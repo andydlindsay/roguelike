@@ -1,10 +1,4 @@
 <md-card >
-  <!--<md-card-header>
-    <md-toolbar color="primary" class="flex-container" fxLayout="row" fxLayoutAlign="center" fxLayoutAlign.xs="start">
-      <h1>Roguelike Dungeon Crawler</h1>
-    </md-toolbar>
-  </md-card-header>-->
-  
   <!--<md-card-content class="flex-container" fxLayout="row" fxLayoutAlign="center" fxLayoutAlign.xs="start">-->
   <md-card-content>
     <div class="flex-container">
@@ -19,12 +13,12 @@
           <h2>XP: {{ hero.xp }} / {{ hero.nextLevelXp }}</h2>
           <h2>HP: {{ hero.health}} / {{ hero.healthMax }}</h2>
           <h2>Weapon: {{ hero.weapon }}</h2>
-          <h3>Node: {{ hero.currentNode }}  MaxDamage: {{ hero.maxDamage }}</h3>
+          <!--<h3>Node: {{ hero.currentNode }}  MaxDamage: {{ hero.maxDamage }}</h3>-->
         </div>
         <hr/>
         <div id="messagearea">
           <div id="messages" *ngFor="let message of messages.slice().reverse(); let myIndex = index">
-            <p *ngIf="myIndex < 12">{{ message }}</p>
+            <p *ngIf="myIndex < 14">{{ message }}</p>
           </div>
         </div>
       </div>

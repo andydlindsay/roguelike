@@ -257,38 +257,59 @@ export class HomeComponent implements OnInit {
             if (nodeType == 'w') {
               this.messages.push('Ouch! You hit the wall!');
             } else if (nodeType == 'b') {
-                this.messages.push('You\'ve found the boss!');
-                // fight the boss
-
-
-
-            } else if (nodeType == 'e') {
-                // fight the enemy
-                let playerDamageDealt = getRandom(Math.floor(0.5 * this.hero.maxDamage), this.hero.maxDamage);
-                this.dungeon.nodes[destinationNode]['hp'] -= playerDamageDealt;
-                this.messages.push('You dealt ' + playerDamageDealt + ' points of damage.');
-                if (this.dungeon.nodes[destinationNode]['hp'] <= 0) {
-                  this.messages.push('You defeated your foe!');
-                  this.hero.xp += 50;
-                  hasLevelledUp();
-                  // move into the destination node
-                  this.dungeon.nodes[destinationNode]['type'] = 'p';
-                  this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
-                  this.hero.currentNode = destinationNode;
-                  // update the graph
-                  updateData();
-                } else {
-                  // enemy strikes player
-                  let enemyDamageDealt = getRandom(Math.floor(maxEnemyDamage * 0.5), maxEnemyDamage);
-                  this.hero.health -= enemyDamageDealt;
-                  this.messages.push('The monster hits you and does ' + enemyDamageDealt + ' points of damage.');
-                  if (this.hero.health <= 0) {
-                    this.hero.health = 0;
-                    this.messages.push('Better luck next time. Press F5 to try again.');
-                    this.messages.push('You\'ve died. Game over.');
-                    playing = false;
-                  }
+              // fight the boss
+              let playerDamageDealt = getRandom(Math.floor(0.5 * this.hero.maxDamage), this.hero.maxDamage);
+              this.dungeon.nodes[destinationNode]['hp'] -= playerDamageDealt;
+              this.messages.push('You dealt ' + playerDamageDealt + ' points of damage.');
+              if (this.dungeon.nodes[destinationNode]['hp'] <= 0) {
+                this.messages.push('Excellent work, brave adventurer.');
+                this.messages.push('You have defeated the boss and beaten the game!');
+                playing = false;
+                // move into the destination node
+                this.dungeon.nodes[destinationNode]['type'] = 'p';
+                this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
+                this.hero.currentNode = destinationNode;
+                // update the graph
+                updateData();
+              } else {
+                // boss strikes player
+                let bossDamageDealt = getRandom(Math.floor(maxBossDamage * 0.5), maxBossDamage);
+                this.hero.health -= bossDamageDealt;
+                this.messages.push('The boss smashes you for ' + bossDamageDealt + ' points of damage.');
+                if (this.hero.health <= 0) {
+                  this.hero.health = 0;
+                  this.messages.push('Better luck next time. Press F5 to try again.');
+                  this.messages.push('You\'ve died. Game over.');
+                  playing = false;
                 }
+              }
+            } else if (nodeType == 'e') {
+              // fight the enemy
+              let playerDamageDealt = getRandom(Math.floor(0.5 * this.hero.maxDamage), this.hero.maxDamage);
+              this.dungeon.nodes[destinationNode]['hp'] -= playerDamageDealt;
+              this.messages.push('You dealt ' + playerDamageDealt + ' points of damage.');
+              if (this.dungeon.nodes[destinationNode]['hp'] <= 0) {
+                this.messages.push('You defeated your foe!');
+                this.hero.xp += 50;
+                hasLevelledUp();
+                // move into the destination node
+                this.dungeon.nodes[destinationNode]['type'] = 'p';
+                this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
+                this.hero.currentNode = destinationNode;
+                // update the graph
+                updateData();
+              } else {
+                // enemy strikes player
+                let enemyDamageDealt = getRandom(Math.floor(maxEnemyDamage * 0.5), maxEnemyDamage);
+                this.hero.health -= enemyDamageDealt;
+                this.messages.push('The monster hits you and does ' + enemyDamageDealt + ' points of damage.');
+                if (this.hero.health <= 0) {
+                  this.hero.health = 0;
+                  this.messages.push('Better luck next time. Press F5 to try again.');
+                  this.messages.push('You\'ve died. Game over.');
+                  playing = false;
+                }
+              }
             } else {
               // console.log('nodeType:', nodeType);
               if (nodeType == 'h') {
