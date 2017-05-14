@@ -16,6 +16,38 @@ export class HomeComponent implements OnInit {
   private d3: D3;
   dungeon: any;
 
+  // hero object
+  hero = {
+    'healthMax': 20,
+    'health': 20,
+    'level': 1,
+    'weapon': 'Dagger',
+    'weaponLevel': 0,
+    'maxDamage': 4,
+    'currentNode': 70,
+    'xp': 0,
+    'nextLevelXp': 100
+  }
+
+  // weapon array
+  weapons = [
+    'Dagger',
+    'Short Sword',
+    'Long Sword',
+    'Great Axe',
+    'Halberd'
+  ];
+
+  // messages array
+  messages = [
+    'Good luck, adventurer.',
+    'Find better weapons and health potions throughout the dungeon.',
+    'Level up by defeating enemies.',
+    'Beat the boss to beat the game.',
+    'Use the arrow keys to move around.',
+    'Welcome to the game.'
+  ];
+
   constructor(
     d3Service: D3Service,
     private titleService: Title,
@@ -50,27 +82,20 @@ export class HomeComponent implements OnInit {
     const d3 = this.d3;
 
     // setup svg component
-    const width = 1312,
-          height = 756,
+    const width = 886,
+          height = 736,
           padding = 60,
           internalPadding = 20;
 
-    // hero object
-    let hero = {
-      'health': 20,
-      'level': 1,
-      'weapon': 'Dagger',
-      'maxDamage': 4,
-      'currentNode': 70
-    }
-    console.log(this.dungeon.nodes[hero.currentNode]);
+    console.log(this.dungeon.nodes[this.hero.currentNode]);
 
+    // alias this.dungeon.nodes
     const nodes = this.dungeon.nodes;
 
     // append svg component
     // zoom based on Sebastian Gruhier's post
     // https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js
-    const svg = d3.select("#svg")
+    const svg = d3.select("#playarea")
       .append("svg")
       .attr("class", "svg")
       .attr("width", width)
@@ -78,10 +103,13 @@ export class HomeComponent implements OnInit {
       .call(d3.zoom().on('zoom', () => {
         svg.attr('transform', d3.event.transform);
       }))
-      .append('g');
+      .append('g')
+      .attr('class', 'main')
+      .attr('width', width)
+      .attr('height', height);
 
     // tooltip
-    const div = d3.select('#svg')
+    const div = d3.select('#playarea')
       .append('div')
       .attr('class', 'tooltip')
       .style('opacity', 0);
@@ -93,13 +121,23 @@ export class HomeComponent implements OnInit {
         this.dungeon.nodes[(i * this.dungeon.width) + j].col = j;
       }
     }
+
+    // randomly place enemies throughout the dungeon
+    
+
+    // randomly place pickups throughout the dungeon
+
+    // randomly place the boss in the dungeon
+
+    // randomly place the hero in the dungeon
+
     console.log('dungeon:', this.dungeon);
 
     // positions of play area
-    const playareaWidth = Math.round(width / 2 - (2 * internalPadding));
-    const playareaHeight = Math.round(height * 0.8 - (2 * internalPadding));
+    const playareaWidth = Math.round(width - (2 * internalPadding));
+    const playareaHeight = Math.round(height - (2 * internalPadding));
     const playareaXZero = 0 + internalPadding;
-    const playareaYZero = height - playareaHeight - (internalPadding * 2);
+    const playareaYZero = 0 + (internalPadding * 2);
 
     // size of play area rects
     const playareaRectWidth = playareaWidth / this.dungeon.width;
@@ -150,51 +188,92 @@ export class HomeComponent implements OnInit {
         let destinationNode;
         if (d3.event.keyCode == 37) {
           // console.log('left');
-          destinationNode = hero.currentNode - 1;
+          destinationNode = this.hero.currentNode - 1;
         } else if (d3.event.keyCode == 38) {
           // console.log('up');
-          destinationNode = hero.currentNode - this.dungeon.width;
+          destinationNode = this.hero.currentNode - this.dungeon.width;
         } else if (d3.event.keyCode == 39) {
           // console.log('right');
-          destinationNode = hero.currentNode + 1;
+          destinationNode = this.hero.currentNode + 1;
         } else if (d3.event.keyCode == 40) {
           // console.log('down');
-          destinationNode = hero.currentNode + this.dungeon.width;
+          destinationNode = this.hero.currentNode + this.dungeon.width;
         }
 
         if (destinationNode != undefined) {
           if (this.dungeon.nodes[destinationNode]['type'] == 'w') {
-            console.log('Ouch! You hit the wall!');
+            this.messages.push('Ouch! You hit the wall!');
           } else {
             // console.log('That\'s a valid move!');
             const nodeType = this.dungeon.nodes[destinationNode]['type'];
             // console.log('nodeType:', nodeType);
             if (nodeType == 'h') {
-              console.log('That\'s a health pickup.');
+              // this.messages.push('That\'s a health pickup.');
+              const currHealth = this.hero.health;
+              this.hero.health += 20;
+              if (this.hero.health > this.hero.healthMax) {
+                this.hero.health = this.hero.healthMax;
+              }
+              const healthRestored = this.hero.health - currHealth;
+              this.messages.push('The health potion restored ' + String(healthRestored) + ' hit points.');
+
             } else if (nodeType == 'e') {
-              console.log('It\'s go time!');
+              this.messages.push('It\'s go time!');
             } else if (nodeType == 'b') {
-              console.log('You\'ve found the boss!');
+              this.messages.push('You\'ve found the boss!');
             } else if (nodeType == 'n') {
-              console.log('Something went seriously wrong.');
+              this.messages.push('Something went seriously wrong.');
             } else if (nodeType == 'u') {
-              console.log('That\'s a weapon upgrade.');
+              // this.messages.push('That\'s a weapon upgrade.');
+              this.hero.weaponLevel += 1;
+              this.hero.weapon = this.weapons[this.hero.weaponLevel];
+              this.hero.maxDamage += 2;
+              this.messages.push('You\'ve found a ' + this.hero.weapon + '!');
             }
             this.dungeon.nodes[destinationNode]['type'] = 'p';
-            this.dungeon.nodes[hero.currentNode]['type'] = 'f';
-            hero.currentNode = destinationNode;
+            this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
+            this.hero.currentNode = destinationNode;
             updateData();
           }
         }
         
       });
 
+      function getRandom(minNum, maxNum) {
+        return Math.floor((Math.random() * maxNum) + minNum);
+      }
+
+      function hasLevelledUp() {
+        if (this.hero.xp >= this.hero.nextLevelXp) {
+          levelUp();
+        }
+      }
+
+      function levelUp() {
+        
+        // increase max health
+        this.hero.healthMax += 10;
+        // set next level xp
+        this.hero.nextLevelXp += 100 * this.hero.level;
+        // increase level
+        this.hero.level += 1;
+        // increase max damage
+        this.hero.maxDamage += 2;
+        // alert player to level up
+        this.messages.push('Congratulations! You\'ve levelled up!');
+        this.messages.push('Your maximum health is now ' + String(this.hero.healthMax) + '.');
+        // this.messages.push('Your maximum damage is now ' + String(this.hero.maxDamage) + '.');
+
+      }
+
       function updateData() {
-        // console.log('updateData has been called');
 
         svg.select('.playarea').exit().remove();
 
-        svg.append('g')
+        // svg.append('g')
+        d3.select('g')
+        .filter('.main')
+        .append('g')
         .attr('class', 'playarea')
         .selectAll('rect')
         .filter('.playarea-node')

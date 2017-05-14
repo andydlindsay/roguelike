@@ -1,10 +1,33 @@
 <md-card >
-  <md-card-header>
+  <!--<md-card-header>
     <md-toolbar color="primary" class="flex-container" fxLayout="row" fxLayoutAlign="center" fxLayoutAlign.xs="start">
       <h1>Roguelike Dungeon Crawler</h1>
     </md-toolbar>
-  </md-card-header>
-  <md-card-content class="flex-container" fxLayout="row" fxLayoutAlign="center" fxLayoutAlign.xs="start">
-    <div id="svg"></div>
+  </md-card-header>-->
+  
+  <!--<md-card-content class="flex-container" fxLayout="row" fxLayoutAlign="center" fxLayoutAlign.xs="start">-->
+  <md-card-content>
+    <div class="flex-container">
+      <div id="title"><h1>Roguelike Dungeon Crawler</h1></div>
+    </div>
+    <div class="flex-container">
+      <div id="playarea"></div>
+      <div id="infoarea">
+        <div id="info">
+          <h1>Adventurer Info</h1>
+          <h2>Level: {{ hero.level }}</h2>
+          <h2>XP: {{ hero.xp }} / {{ hero.nextLevelXp }}</h2>
+          <h2>HP: {{ hero.health}} / {{ hero.healthMax }}</h2>
+          <h2>Weapon: {{ hero.weapon }}</h2>
+          <h3>Node: {{ hero.currentNode }}  MaxDamage: {{ hero.maxDamage }}</h3>
+        </div>
+        <hr/>
+        <div id="messagearea">
+          <div id="messages" *ngFor="let message of messages.slice().reverse(); let myIndex = index">
+            <p *ngIf="myIndex < 12">{{ message }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </md-card-content>
 </md-card>

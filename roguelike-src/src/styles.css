@@ -26,15 +26,50 @@ md-card-content {
   display: flex;
 }
 
+#playarea {
+  flex: 5;
+  background-color: black;
+  padding-bottom: 40px;
+}
+
+#infoarea {
+  flex: 2;
+  background-color: black;
+  color: orange;
+  /*max-height: 756px;*/
+  padding: 20px;
+}
+
+#title {
+  text-align: center;
+  color: orange;
+  background-color: black;
+  flex: 1;
+}
+
 .legendQuant {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .svg {
   margin: auto;
+  /*margin: 20px;*/
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.main {
+  margin: auto;
   margin-top: 20px;
   padding-left: 16px;
   padding-right: 16px;
+}
+
+.messageArea {
+  position: absolute;
+  padding: 10px;
+  font: 12px sans-serif;
+  background: #D7C7AD;
 }
 
 svg {
@@ -96,9 +131,9 @@ div.tooltip {
 }
 
 .node {
-    fill: #ccc;
-    stroke: #fff;
-    stroke-width: 2px;
+  fill: #ccc;
+  stroke: #fff;
+  stroke-width: 2px;
 }
 
 .land {
