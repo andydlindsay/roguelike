@@ -48,6 +48,9 @@ export class HomeComponent implements OnInit {
     'Welcome to the game.'
   ];
 
+  // game difficulty
+  gameDifficulty = 1;
+
   constructor(
     d3Service: D3Service,
     private titleService: Title,
@@ -91,6 +94,9 @@ export class HomeComponent implements OnInit {
 
     // alias this.dungeon.nodes
     const nodes = this.dungeon.nodes;
+    let hero = this.hero;
+    let messages = this.messages;
+    let playing = true;
 
     // append svg component
     // zoom based on Sebastian Gruhier's post
@@ -145,7 +151,7 @@ export class HomeComponent implements OnInit {
       let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'e';
-        this.dungeon.nodes[selectedNode]['hp'] = 8;
+        this.dungeon.nodes[selectedNode]['hp'] = Math.round(9 * this.gameDifficulty);
         placedEnemies += 1;
       }
     }
@@ -156,7 +162,7 @@ export class HomeComponent implements OnInit {
       let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'b';
-        this.dungeon.nodes[selectedNode]['hp'] = 36;
+        this.dungeon.nodes[selectedNode]['hp'] = Math.round(36 * this.gameDifficulty);
         bossPlaced = true;
       }
     }
@@ -222,6 +228,10 @@ export class HomeComponent implements OnInit {
         }
       });
 
+    // enemy damage
+    const maxEnemyDamage = Math.round(8 * this.gameDifficulty);
+    const maxBossDamage = Math.round(12 * this.gameDifficulty);
+
     // movement in nodes
     d3.select('body')
       .on('keydown', () => {
@@ -241,51 +251,77 @@ export class HomeComponent implements OnInit {
           destinationNode = this.hero.currentNode + this.dungeon.width;
         }
 
-        if (destinationNode != undefined) {
-          if (this.dungeon.nodes[destinationNode]['type'] == 'w') {
-            this.messages.push('Ouch! You hit the wall!');
-          } else {
-            // console.log('That\'s a valid move!');
+        if (playing) {
+          if (destinationNode != undefined) {
             const nodeType = this.dungeon.nodes[destinationNode]['type'];
-            // console.log('nodeType:', nodeType);
-            if (nodeType == 'h') {
-              // this.messages.push('That\'s a health pickup.');
-              const currHealth = this.hero.health;
-              this.hero.health += 20;
-              if (this.hero.health > this.hero.healthMax) {
-                this.hero.health = this.hero.healthMax;
-              }
-              const healthRestored = this.hero.health - currHealth;
-              this.messages.push('The health potion restored ' + String(healthRestored) + ' hit points.');
+            if (nodeType == 'w') {
+              this.messages.push('Ouch! You hit the wall!');
+            } else if (nodeType == 'b') {
+                this.messages.push('You\'ve found the boss!');
+                // fight the boss
+
+
 
             } else if (nodeType == 'e') {
-              this.messages.push('It\'s go time!');
-              // fight the enemy
+                // fight the enemy
+                let playerDamageDealt = getRandom(Math.floor(0.5 * this.hero.maxDamage), this.hero.maxDamage);
+                this.dungeon.nodes[destinationNode]['hp'] -= playerDamageDealt;
+                this.messages.push('You dealt ' + playerDamageDealt + ' points of damage.');
+                if (this.dungeon.nodes[destinationNode]['hp'] <= 0) {
+                  this.messages.push('You defeated your foe!');
+                  this.hero.xp += 50;
+                  hasLevelledUp();
+                  // move into the destination node
+                  this.dungeon.nodes[destinationNode]['type'] = 'p';
+                  this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
+                  this.hero.currentNode = destinationNode;
+                  // update the graph
+                  updateData();
+                } else {
+                  // enemy strikes player
+                  let enemyDamageDealt = getRandom(Math.floor(maxEnemyDamage * 0.5), maxEnemyDamage);
+                  this.hero.health -= enemyDamageDealt;
+                  this.messages.push('The monster hits you and does ' + enemyDamageDealt + ' points of damage.');
+                  if (this.hero.health <= 0) {
+                    this.hero.health = 0;
+                    this.messages.push('Better luck next time. Press F5 to try again.');
+                    this.messages.push('You\'ve died. Game over.');
+                    playing = false;
+                  }
+                }
+            } else {
+              // console.log('nodeType:', nodeType);
+              if (nodeType == 'h') {
+                // this.messages.push('That\'s a health pickup.');
+                const currHealth = this.hero.health;
+                this.hero.health += 20;
+                if (this.hero.health > this.hero.healthMax) {
+                  this.hero.health = this.hero.healthMax;
+                }
+                const healthRestored = this.hero.health - currHealth;
+                this.messages.push('The health potion restored ' + String(healthRestored) + ' hit points.');
 
-            } else if (nodeType == 'b') {
-              this.messages.push('You\'ve found the boss!');
-              // fight the boss
-
-            } else if (nodeType == 'n') {
-              this.messages.push('Something went seriously wrong.');
-            } else if (nodeType == 'u') {
-              // this.messages.push('That\'s a weapon upgrade.');
-              this.hero.weaponLevel += 1;
-              if (this.hero.weaponLevel >= this.weapons.length) {
-                this.hero.weapon = 'Enchanted ' + this.weapons[this.hero.weaponLevel % this.weapons.length];
-              } else {
-                this.hero.weapon = this.weapons[this.hero.weaponLevel];
+              } else if (nodeType == 'n') {
+                this.messages.push('Something went seriously wrong.');
+              } else if (nodeType == 'u') {
+                // this.messages.push('That\'s a weapon upgrade.');
+                this.hero.weaponLevel += 1;
+                if (this.hero.weaponLevel >= this.weapons.length) {
+                  this.hero.weapon = 'Enchanted ' + this.weapons[this.hero.weaponLevel % this.weapons.length];
+                } else {
+                  this.hero.weapon = this.weapons[this.hero.weaponLevel];
+                }
+                this.hero.maxDamage += 2;
+                this.messages.push('You\'ve found a ' + this.hero.weapon + '!');
               }
-              this.hero.maxDamage += 2;
-              this.messages.push('You\'ve found a ' + this.hero.weapon + '!');
-            }
 
-            // move into the destination node
-            this.dungeon.nodes[destinationNode]['type'] = 'p';
-            this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
-            this.hero.currentNode = destinationNode;
-            // update the graph
-            updateData();
+              // move into the destination node
+              this.dungeon.nodes[destinationNode]['type'] = 'p';
+              this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
+              this.hero.currentNode = destinationNode;
+              // update the graph
+              updateData();
+            }
           }
         }
         
@@ -296,26 +332,25 @@ export class HomeComponent implements OnInit {
       }
 
       function hasLevelledUp() {
-        if (this.hero.xp >= this.hero.nextLevelXp) {
+        if (hero.xp >= hero.nextLevelXp) {
           levelUp();
         }
       }
 
       function levelUp() {
-        
-        // increase max health
-        this.hero.healthMax += 10;
+        // increase max health and current health
+        hero.healthMax += 10;
+        hero.health += 10;
         // set next level xp
-        this.hero.nextLevelXp += 100 * this.hero.level;
+        hero.nextLevelXp += 100 * hero.level;
         // increase level
-        this.hero.level += 1;
+        hero.level += 1;
         // increase max damage
-        this.hero.maxDamage += 2;
+        hero.maxDamage += 2;
         // alert player to level up
-        this.messages.push('Congratulations! You\'ve levelled up!');
-        this.messages.push('Your maximum health is now ' + String(this.hero.healthMax) + '.');
+        messages.push('Your maximum health is now ' + String(hero.healthMax) + '.');
+        messages.push('Congratulations! You\'ve levelled up!');
         // this.messages.push('Your maximum damage is now ' + String(this.hero.maxDamage) + '.');
-
       }
 
       function updateData() {
