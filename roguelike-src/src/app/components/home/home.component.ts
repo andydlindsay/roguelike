@@ -122,14 +122,55 @@ export class HomeComponent implements OnInit {
       }
     }
 
-    // randomly place enemies throughout the dungeon
-    
-
     // randomly place pickups throughout the dungeon
+    let placedItems = 0;
+    const maxItems = 5;
+    while (placedItems < maxItems) {
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
+        let itemToPlace = getRandom(1, 3);
+        if (itemToPlace <= 2) {
+          this.dungeon.nodes[selectedNode]['type'] = 'h';
+        } else {
+          this.dungeon.nodes[selectedNode]['type'] = 'u';
+        }
+        placedItems += 1;
+      }
+    }
+
+    // randomly place enemies throughout the dungeon
+    let placedEnemies = 0;
+    const maxEnemies = 7;
+    while (placedEnemies < maxEnemies) {
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
+        this.dungeon.nodes[selectedNode]['type'] = 'e';
+        this.dungeon.nodes[selectedNode]['hp'] = 8;
+        placedEnemies += 1;
+      }
+    }
 
     // randomly place the boss in the dungeon
+    let bossPlaced = false;
+    while (!bossPlaced) {
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
+        this.dungeon.nodes[selectedNode]['type'] = 'b';
+        this.dungeon.nodes[selectedNode]['hp'] = 36;
+        bossPlaced = true;
+      }
+    }
 
     // randomly place the hero in the dungeon
+    let heroPlaced = false;
+    while (!heroPlaced) {
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
+        this.dungeon.nodes[selectedNode]['type'] = 'p';
+        heroPlaced = true;
+        this.hero.currentNode = selectedNode;
+      }
+    }
 
     console.log('dungeon:', this.dungeon);
 
@@ -219,20 +260,31 @@ export class HomeComponent implements OnInit {
 
             } else if (nodeType == 'e') {
               this.messages.push('It\'s go time!');
+              // fight the enemy
+
             } else if (nodeType == 'b') {
               this.messages.push('You\'ve found the boss!');
+              // fight the boss
+
             } else if (nodeType == 'n') {
               this.messages.push('Something went seriously wrong.');
             } else if (nodeType == 'u') {
               // this.messages.push('That\'s a weapon upgrade.');
               this.hero.weaponLevel += 1;
-              this.hero.weapon = this.weapons[this.hero.weaponLevel];
+              if (this.hero.weaponLevel >= this.weapons.length) {
+                this.hero.weapon = 'Enchanted ' + this.weapons[this.hero.weaponLevel % this.weapons.length];
+              } else {
+                this.hero.weapon = this.weapons[this.hero.weaponLevel];
+              }
               this.hero.maxDamage += 2;
               this.messages.push('You\'ve found a ' + this.hero.weapon + '!');
             }
+
+            // move into the destination node
             this.dungeon.nodes[destinationNode]['type'] = 'p';
             this.dungeon.nodes[this.hero.currentNode]['type'] = 'f';
             this.hero.currentNode = destinationNode;
+            // update the graph
             updateData();
           }
         }

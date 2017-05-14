@@ -3,7 +3,7 @@
 
 ### User Stories
 - [X] I have health, a level, and a weapon. I can pick up a better weapon. I can pick up health items.
-- [ ] All the items and enemies on the map are arranged at random.
+- [X] All the items and enemies on the map are arranged at random.
 - [X] I can move throughout a map, discovering items.
 - [X] I can move anywhere within the map's boundaries, but I can't move through an enemy until I've beaten it.
 - [ ] Much of the map is hidden. When I take a step, all spaces that are within a certain number of spaces from me are revealed.
