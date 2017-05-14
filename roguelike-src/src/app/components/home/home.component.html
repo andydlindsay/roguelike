@@ -16,9 +16,14 @@
           <!--<h3>Node: {{ hero.currentNode }}  MaxDamage: {{ hero.maxDamage }}</h3>-->
         </div>
         <hr/>
+        <div id="legendarea">
+          <h2>Legend</h2>
+          <div id="legend"></div>
+        </div>
+        <hr/>
         <div id="messagearea">
           <div id="messages" *ngFor="let message of messages.slice().reverse(); let myIndex = index">
-            <p *ngIf="myIndex < 14">{{ message }}</p>
+            <p *ngIf="myIndex < 9">{{ message }}</p>
           </div>
         </div>
       </div>

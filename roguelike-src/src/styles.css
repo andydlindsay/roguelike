@@ -13,7 +13,7 @@ body {
 }
 
 md-card {
-  width: 80%;
+  width: 1300px;
   margin: auto;
   opacity: 0.95;
 }
@@ -30,6 +30,8 @@ md-card-content {
   flex: 5;
   background-color: black;
   padding-bottom: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 #infoarea {
@@ -87,6 +89,15 @@ svg {
   padding-left: 60px;
   font-size: 0.75em;
   color: blue;
+}
+
+#legend {
+  height: 110px;
+}
+
+text {
+  stroke: none;
+  fill: orange;
 }
 
 .bar {

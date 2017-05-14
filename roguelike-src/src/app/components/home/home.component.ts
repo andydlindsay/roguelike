@@ -90,13 +90,57 @@ export class HomeComponent implements OnInit {
           padding = 60,
           internalPadding = 20;
 
-    console.log(this.dungeon.nodes[this.hero.currentNode]);
+    // console.log(this.dungeon.nodes[this.hero.currentNode]);
 
     // alias this.dungeon.nodes
     const nodes = this.dungeon.nodes;
+    const dungeonWidth = this.dungeon.width;
     let hero = this.hero;
     let messages = this.messages;
     let playing = true;
+    let visionRadius = 3;
+
+    // get fov for fog of war
+    // generates an array of visible nodes based on hero position
+    function getFov(heroNode, visionRadius, dungeonWidth) {
+      let returnArray = [];
+      returnArray.push(heroNode);
+      for (let i = 0; i <= visionRadius; i++) {
+        for (let j = 0; j <= visionRadius - i; j++) {
+          if (i > 0) {
+            // rows above and below the heroNode
+            if (j > 0) {
+              // coloumns left and right of heroNode
+              if (j < dungeonWidth - (heroNode % dungeonWidth)) {
+                returnArray.push(heroNode + i * dungeonWidth + j);
+                returnArray.push(heroNode - i * dungeonWidth + j);
+              }
+              
+              if (j <= heroNode % dungeonWidth) {
+                returnArray.push(heroNode + i * dungeonWidth - j);              
+                returnArray.push(heroNode - i * dungeonWidth - j);
+              }
+            } else {
+              // same column as heroNode
+              returnArray.push(heroNode + i * dungeonWidth);
+              returnArray.push(heroNode - i * dungeonWidth);
+            }
+          } else {
+            // same row as the heroNode
+            if (j > 0) {
+              if (j < dungeonWidth - (heroNode % dungeonWidth)) {
+                returnArray.push(heroNode + j);
+              }
+
+              if (j <= heroNode % dungeonWidth) {
+                returnArray.push(heroNode - j);
+              }
+            }
+          }
+        }
+      }
+      return returnArray;
+    }
 
     // append svg component
     // zoom based on Sebastian Gruhier's post
@@ -178,8 +222,6 @@ export class HomeComponent implements OnInit {
       }
     }
 
-    console.log('dungeon:', this.dungeon);
-
     // positions of play area
     const playareaWidth = Math.round(width - (2 * internalPadding));
     const playareaHeight = Math.round(height - (2 * internalPadding));
@@ -208,25 +250,51 @@ export class HomeComponent implements OnInit {
       .attr('y', (d) => playareaYZero + (d['row'] * playareaRectHeight))
       .attr('width', playareaRectWidth)
       .attr('height', playareaRectHeight)
-      .attr('fill', (d) => {
-        if (d['type'] == 'w') {
-          return '#766951';
-        } else if (d['type'] == 'f') {
-          return '#D7C7AD';
-        } else if (d['type'] == 'p') {
-          return 'blue';
-        } else if (d['type'] == 'e') {
-          return 'red';
-        } else if (d['type'] == 'h') {
-          return 'green';
-        } else if (d['type'] == 'u') {
-          return 'yellow';
-        } else if (d['type'] == 'b') {
-          return 'purple';
+      .attr('fill', (d, i) => {
+        const fovArray = getFov(hero.currentNode, visionRadius, dungeonWidth);
+        if (fovArray.indexOf(i) != -1) {
+          if (d['type'] == 'w') {
+            return '#766951';
+          } else if (d['type'] == 'f') {
+            return '#D7C7AD';
+          } else if (d['type'] == 'p') {
+            return 'blue';
+          } else if (d['type'] == 'e') {
+            return 'red';
+          } else if (d['type'] == 'h') {
+            return 'green';
+          } else if (d['type'] == 'u') {
+            return 'yellow';
+          } else if (d['type'] == 'b') {
+            return 'purple';
+          } else {
+            return 'none';
+          }
         } else {
           return 'none';
         }
       });
+
+    // legend
+    const ordinal = d3.scaleOrdinal()
+      .domain(['Hero', 'Monster', 'Boss', 'Health Potion', 'Weapon Upgrade'])
+      .range(['blue', 'red', 'purple', 'green', 'yellow']);
+
+    const legend = d3.select('#legend')
+      .append('svg')
+      .attr('height', '100px');
+
+    legend.append('g')
+      .attr('class', 'legendQuant')
+      .attr('transform', 'translate(0,0)');
+
+    const colorLegend = legendColor()
+      .shapeWidth(25)
+      .orient('vertical')
+      .scale(ordinal);
+
+    legend.select('.legendQuant')
+      .call(colorLegend);
 
     // enemy damage
     const maxEnemyDamage = Math.round(8 * this.gameDifficulty);
@@ -260,7 +328,7 @@ export class HomeComponent implements OnInit {
               // fight the boss
               let playerDamageDealt = getRandom(Math.floor(0.5 * this.hero.maxDamage), this.hero.maxDamage);
               this.dungeon.nodes[destinationNode]['hp'] -= playerDamageDealt;
-              this.messages.push('You dealt ' + playerDamageDealt + ' points of damage.');
+              this.messages.push('You smite the boss for ' + playerDamageDealt + ' points of damage.');
               if (this.dungeon.nodes[destinationNode]['hp'] <= 0) {
                 this.messages.push('Excellent work, brave adventurer.');
                 this.messages.push('You have defeated the boss and beaten the game!');
@@ -287,7 +355,7 @@ export class HomeComponent implements OnInit {
               // fight the enemy
               let playerDamageDealt = getRandom(Math.floor(0.5 * this.hero.maxDamage), this.hero.maxDamage);
               this.dungeon.nodes[destinationNode]['hp'] -= playerDamageDealt;
-              this.messages.push('You dealt ' + playerDamageDealt + ' points of damage.');
+              this.messages.push('You dealt ' + playerDamageDealt + ' points of damage to the monster.');
               if (this.dungeon.nodes[destinationNode]['hp'] <= 0) {
                 this.messages.push('You defeated your foe!');
                 this.hero.xp += 50;
@@ -399,21 +467,26 @@ export class HomeComponent implements OnInit {
         .attr('y', (d) => playareaYZero + (d['row'] * playareaRectHeight))
         .attr('width', playareaRectWidth)
         .attr('height', playareaRectHeight)
-        .attr('fill', (d) => {
-          if (d['type'] == 'w') {
-            return '#766951';
-          } else if (d['type'] == 'f') {
-            return '#D7C7AD';
-          } else if (d['type'] == 'p') {
-            return 'blue';
-          } else if (d['type'] == 'e') {
-            return 'red';
-          } else if (d['type'] == 'h') {
-            return 'green';
-          } else if (d['type'] == 'u') {
-            return 'yellow';
-          } else if (d['type'] == 'b') {
-            return 'purple';
+        .attr('fill', (d, i) => {
+          const fovArray = getFov(hero.currentNode, visionRadius, dungeonWidth);
+          if (fovArray.indexOf(i) != -1) {
+            if (d['type'] == 'w') {
+              return '#766951';
+            } else if (d['type'] == 'f') {
+              return '#D7C7AD';
+            } else if (d['type'] == 'p') {
+              return 'blue';
+            } else if (d['type'] == 'e') {
+              return 'red';
+            } else if (d['type'] == 'h') {
+              return 'green';
+            } else if (d['type'] == 'u') {
+              return 'yellow';
+            } else if (d['type'] == 'b') {
+              return 'purple';
+            } else {
+              return 'none';
+            }
           } else {
             return 'none';
           }
