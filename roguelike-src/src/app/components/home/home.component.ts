@@ -349,7 +349,7 @@ export class HomeComponent implements OnInit {
       });
 
       function getRandom(minNum, maxNum) {
-        return Math.floor((Math.random() * maxNum) + minNum);
+        return Math.floor((Math.random() * (maxNum - minNum + 1)) + minNum);
       }
 
       function hasLevelledUp() {
