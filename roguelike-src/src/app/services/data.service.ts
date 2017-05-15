@@ -10,6 +10,42 @@ export class DataService {
   ) { }
 
   getDungeon() {
+    const levelString = 'nwwwwwnwwwwwwwwwwwwwwnnnnnwwwww'
+                      + 'wwfffwwwffffffffwwffwnwwwnwfffw'
+                      + 'wfffffwwfffwwwffffffwwwfwwwwffw'
+                      + 'wfffffwwwwwwwwwfwwwwwffffwwwfww'
+                      + 'wwwffwwnwwffffffwwwwffwffwwffwn'
+                      + 'nwffwwnwwffwwwffwffffwwwfwfffwn'
+                      + 'nwfffwwwffwwwfffffwwwwwffffwwwn'
+                      + 'nwwwffwfffwwwfwwwffwwwwwfffffww'
+                      + 'nnwwfffffffwffwwffffffwwwfffffw'
+                      + 'nwwffwfffffffwwffffffffwwwffffw'
+                      + 'nwfffwwffffwwwfffffwwwffwwwfffw'
+                      + 'nwffwwwwfwwwwfffffwwnwfffwfffww'
+                      + 'nwffwwwffwnnwfffwfwwwwwwfwffwwn'
+                      + 'nwffffwfwwwwwwfwwfwwfwwwfffwwnn'
+                      + 'nwffwfffwnwffffwffwffffffwffwnn'
+                      + 'nwffwwwwwnwfwwwwffffwwffwwffwnn'
+                      + 'nwwffffwnnwffwwwwwwffwwwwffwwnn'
+                      + 'nnwwwwfwnnwwffffwwwwffffffwwwww'
+                      + 'nnwwwffwwwwwwfwffwwwffffffffffw'
+                      + 'nnwfffwwffffffwfffwwwwffffwwffw'
+                      + 'nnwfwwwffwfwwwwfwffwwwffffwwwww'
+                      + 'nwwffwwfwwffwwwwwwfwwffffwwwnnn'
+                      + 'wwffffwfwwwfffffwffwwffwfffwwnn'
+                      + 'wffffwwffwwwffwfffwwwwfwwffwwnn'
+                      + 'wwfffwwwffwwwffffwwwwffwwwffwww'
+                      + 'nwffwwnwwffwfffffffwwfwwwwwfffw'
+                      + 'nwfffwwwffffffwwfffwffffffwwffw'
+                      + 'nwwfffwwffwwwffffffwffffffwwwfw'
+                      + 'nnwwfffffwwnwwfffffwwwfffwwwffw'
+                      + 'nnnwwwwwwwnnnwwwwwwwnwwwwwnwwww';
+
+    const levelArray = [];
+    for (let i = 0; i < levelString.length; i++) {
+      levelArray.push({ 'type': levelString[i]});
+    }
+
     const levels = [
       {
         'name': 'First Try',
@@ -370,10 +406,17 @@ export class DataService {
           { 'type': 'n' }
 
         ]
+      },
+      {
+        'name': 'Production Ready',
+        'type': 'production',
+        'width': 31,
+        'height': 30,
+        'nodes': levelArray
       }
     ];
 
-    const randomNumber = 1;
+    const randomNumber = 2;
     return levels[randomNumber];
   }
 

@@ -3,7 +3,7 @@ import { D3Service, D3, Selection, SimulationNodeDatum, SimulationLinkDatum, For
 import { Title } from '@angular/platform-browser';
 import { DataService } from '../../services/data.service';
 import { legendColor } from 'd3-svg-legend';
-import * as topojson from 'topojson';
+// import * as topojson from 'topojson';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
     'level': 1,
     'weapon': 'Dagger',
     'weaponLevel': 0,
-    'maxDamage': 4,
+    'maxDamage': 5,
     'currentNode': 70,
     'xp': 0,
     'nextLevelXp': 100
@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit {
   ];
 
   // game difficulty
-  gameDifficulty = 1;
+  gameDifficulty = 1.25;
 
   constructor(
     d3Service: D3Service,
@@ -89,8 +89,6 @@ export class HomeComponent implements OnInit {
           height = 736,
           padding = 60,
           internalPadding = 20;
-
-    // console.log(this.dungeon.nodes[this.hero.currentNode]);
 
     // alias this.dungeon.nodes
     const nodes = this.dungeon.nodes;
@@ -174,7 +172,7 @@ export class HomeComponent implements OnInit {
 
     // randomly place pickups throughout the dungeon
     let placedItems = 0;
-    const maxItems = 5;
+    const maxItems = Math.round(this.dungeon.width / 2.7);
     while (placedItems < maxItems) {
       let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
@@ -190,12 +188,12 @@ export class HomeComponent implements OnInit {
 
     // randomly place enemies throughout the dungeon
     let placedEnemies = 0;
-    const maxEnemies = 7;
+    const maxEnemies = Math.round(this.dungeon.width / 1.8);
     while (placedEnemies < maxEnemies) {
       let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'e';
-        this.dungeon.nodes[selectedNode]['hp'] = Math.round(9 * this.gameDifficulty);
+        this.dungeon.nodes[selectedNode]['hp'] = Math.round(10 * this.gameDifficulty);
         placedEnemies += 1;
       }
     }
@@ -206,7 +204,7 @@ export class HomeComponent implements OnInit {
       let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'b';
-        this.dungeon.nodes[selectedNode]['hp'] = Math.round(36 * this.gameDifficulty);
+        this.dungeon.nodes[selectedNode]['hp'] = Math.round(40 * this.gameDifficulty);
         bossPlaced = true;
       }
     }
@@ -277,7 +275,7 @@ export class HomeComponent implements OnInit {
 
     // legend
     const ordinal = d3.scaleOrdinal()
-      .domain(['Hero', 'Monster', 'Boss', 'Health Potion', 'Weapon Upgrade'])
+      .domain(['Adventurer', 'Monster', 'Boss', 'Health Potion', 'Weapon Upgrade'])
       .range(['blue', 'red', 'purple', 'green', 'yellow']);
 
     const legend = d3.select('#legend')
@@ -289,7 +287,7 @@ export class HomeComponent implements OnInit {
       .attr('transform', 'translate(0,0)');
 
     const colorLegend = legendColor()
-      .shapeWidth(25)
+      .shapeWidth(20)
       .orient('vertical')
       .scale(ordinal);
 
