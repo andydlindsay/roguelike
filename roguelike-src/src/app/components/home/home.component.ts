@@ -41,6 +41,7 @@ export class HomeComponent implements OnInit {
   // messages array
   messages = [
     'Good luck, adventurer.',
+    'Zoom the map with the mouse scroll wheel.',
     'Find better weapons and health potions throughout the dungeon.',
     'Level up by defeating enemies.',
     'Beat the boss to beat the game.',
