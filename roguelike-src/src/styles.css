@@ -1,16 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/indigo-pink.css';
 
-/*html {
-  height: 100%;
-}*/
-
 body {
   background-image: url("https://s3.amazonaws.com/andydlindsay-fcc/roguelike/fire.jpeg");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-  min-height: 100%;
+  min-height: 98vh;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
