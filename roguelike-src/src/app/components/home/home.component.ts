@@ -175,7 +175,7 @@ export class HomeComponent implements OnInit {
     let placedItems = 0;
     const maxItems = Math.round(this.dungeon.width / 2.7);
     while (placedItems < maxItems) {
-      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height - 1);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         let itemToPlace = getRandom(1, 3);
         if (itemToPlace <= 2) {
@@ -191,7 +191,7 @@ export class HomeComponent implements OnInit {
     let placedEnemies = 0;
     const maxEnemies = Math.round(this.dungeon.width / 1.8);
     while (placedEnemies < maxEnemies) {
-      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height - 1);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'e';
         this.dungeon.nodes[selectedNode]['hp'] = Math.round(10 * this.gameDifficulty);
@@ -202,7 +202,7 @@ export class HomeComponent implements OnInit {
     // randomly place the boss in the dungeon
     let bossPlaced = false;
     while (!bossPlaced) {
-      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height - 1);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'b';
         this.dungeon.nodes[selectedNode]['hp'] = Math.round(40 * this.gameDifficulty);
@@ -213,7 +213,7 @@ export class HomeComponent implements OnInit {
     // randomly place the hero in the dungeon
     let heroPlaced = false;
     while (!heroPlaced) {
-      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height);
+      let selectedNode = getRandom(0, this.dungeon.width * this.dungeon.height - 1);
       if (this.dungeon.nodes[selectedNode]['type'] == 'f') {
         this.dungeon.nodes[selectedNode]['type'] = 'p';
         heroPlaced = true;
